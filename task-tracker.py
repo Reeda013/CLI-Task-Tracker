@@ -4,38 +4,41 @@ import json
 
 def add(args):
     
-    description = " ".join(args[2:])
+    if len(args) >= 3:
+        description = " ".join(args[2:])
 
-    #gets the tasks if file exists if not it initializes it
-    if os.path.exists("tasks.json"):
-        with open("tasks.json", "r") as file:
-            try:
-                tasks = json.load(file)
+        #gets the tasks if file exists if not it initializes it
+        if os.path.exists("tasks.json"):
+            with open("tasks.json", "r") as file:
+                try:
+                    tasks = json.load(file)
 
-            except json.JSONDecodeError:
-                tasks = []
+                except json.JSONDecodeError:
+                    tasks = []
+        else:
+            tasks = []
+        
+        #Gets the appropriate id
+        if tasks:
+            max_id = max(task["id"] for task in tasks)
+        else:
+            max_id = 0
+
+        #Data concerning the task
+        task = {"id": max_id+1,
+                "description": description,
+                "status": "todo",
+                "createdAt": time.strftime("%d-%m-%Y %H:%M:%S", time.localtime()),
+                "updatedAt": time.strftime("%d-%m-%Y %H:%M:%S", time.localtime())}
+        
+        tasks.append(task)
+
+        with open("tasks.json", "w") as file:
+            json.dump(tasks, file, indent=4)
+        
+        print(f"{description} added with id: {max_id+1}")
     else:
-        tasks = []
-    
-    #Gets the appropriate id
-    if tasks:
-        max_id = max(task["id"] for task in tasks)
-    else:
-        max_id = 0
-
-    #Data concerning the task
-    task = {"id": max_id+1,
-              "description": description,
-              "status": "todo",
-              "createdAt": time.strftime("%d-%m-%Y %H:%M:%S", time.localtime()),
-              "updatedAt": time.strftime("%d-%m-%Y %H:%M:%S", time.localtime())}
-    
-    tasks.append(task)
-
-    with open("tasks.json", "w") as file:
-        json.dump(tasks, file, indent=4)
-    
-    print(f"{description} added with id: {max_id}")
+        print("No task to be added")
 
 def list(args):
 
