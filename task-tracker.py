@@ -87,6 +87,54 @@ def list(args):
         print("No tasks to be shown")
 
 
+def update(args):
+    if os.path.exists("tasks.json"):
+        with open("tasks.json", "r") as file:
+            try:
+                tasks = json.load(file)
+                
+                if len(args) <= 3:
+                    print(f"not enough arguments")
+                    return
+                
+                id = args[2]
+                #Check if id is valid
+                if not id.isdigit():
+                    print(f"Invalid id: {id}")  
+                    return
+
+                description = " ".join(args[3:])
+            
+                #To check if we have found the correspondant task
+                found = False 
+                #Loop over tasks until task with correspondant id is found
+                #Update the description and the last updated time
+                for task in tasks:
+                    if task["id"] == int(id):
+                        task["description"] = description
+                        task["updatedAt"] = time.strftime("%d-%m-%Y %H:%M:%S", time.localtime())
+                        found = True
+                        break
+                #If we loop over all the task and we don't find a correspondant id
+                #We return a message
+                if not found:
+                    print(f"No task assigned to id: {id}")
+                    return
+
+                #Writing in the Json + confirmation message
+                with open("tasks.json", "w") as file:           
+                    json.dump(tasks, file, indent=4)    
+                    print(f"changed {id} to {description}")
+            
+            #In case file is corrupted
+            except json.JSONDecodeError:
+                print("No task to be updated")
+    #In case there is no file
+    else:
+        print("No tasks to be updated")
+                    
+
+
 #handling and calling each command
 def main():
     if len(sys.argv) >= 2:
@@ -95,7 +143,8 @@ def main():
             add(sys.argv)
         elif command == "list":
             list(sys.argv)
-        
+        elif command == "update":
+            update(sys.argv)
         else:
             print(f"Unkown command: {command}")
     else:
