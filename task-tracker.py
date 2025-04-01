@@ -237,6 +237,52 @@ def in_progress(args):
     except json.JSONDecodeError:
         print("No tasks to mark in progress")
 
+def done(args):
+
+    if not os.path.exists("tasks.json"):
+        print("No tasks to mark as done")
+        return
+
+    try:
+        with open("tasks.json", "r") as file:
+            tasks = json.load(file)
+        #Base cases
+        if not tasks:
+            print("No tasks to mark as done")
+            return
+        
+        elif len(args) <= 2:
+            print("Not enough arguments")
+            return
+        
+        elif len(args) > 3:
+            print("Operation supports 1 argument only")
+            return
+        
+        elif not args[2].isdigit():
+            print("Invalid Id")
+            return
+        
+        id = args[2]
+        found = False
+
+        for task in tasks:
+            if task["id"] == int(id):
+                task["status"] = "done"
+                task["updatedAt"] = time.strftime("%d-%m-%Y %H:%M:%S", time.localtime())
+                found = True
+                break
+        
+        if not found:
+            print(f"No task with Id: {id}")
+            return
+        
+        with open("tasks.json", "w") as file:
+            json.dump(tasks, file, indent=4)
+            print(f"Marked {task["description"]} as done")
+
+    except json.JSONDecodeError:
+        print("No tasks to mark as done")
 
 
 #handling and calling each command
@@ -253,6 +299,8 @@ def main():
             delete(sys.argv)
         elif command == "mark-in-progress":
             in_progress(sys.argv)
+        elif command == "mark-done":
+            done(sys.argv)
         else:
             print(f"Unkown command: {command}")
     else:
