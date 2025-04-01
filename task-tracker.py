@@ -51,7 +51,8 @@ def list(args):
                 if tasks:        
 
                         try:
-                            printed = False #Flag to check if there was a print
+                            printed = False 
+                            #Flag to check if there was a print
                             for task in tasks:
                                 #Check to see if there was more than the 
                                 # desired number of arguments
@@ -71,19 +72,24 @@ def list(args):
                                     print(f"{task["id"]} - {task["description"]}")
                                     printed = True
 
-                            if not printed: #if there was no print
+                            if not printed: 
+                                #if there was no print
                                 print(f"No tasks marked as {status}")
 
-                        except IndexError:    #if there is no argument
-                        #Get the informations needed for each task
+                        except IndexError:    
+                            #if there is no argument
+                            #Get the informations needed for each task
                             for task in tasks:
                                 print(f"{task["id"]} - {task["description"]} : {task["status"]} ")
-                else:   #tasks list is empty
+                else:   
+                    #tasks list is empty
                     print("No tasks to be listed")
 
-            except json.JSONDecodeError:    #Json file is empty or corrupted
+            except json.JSONDecodeError:    
+                #Json file is empty or corrupted
                 print("No tasks to be shown")
-    else:   #Json file doesn't exist
+    else:   
+        #Json file doesn't exist
         print("No tasks to be shown")
 
 
@@ -133,7 +139,48 @@ def update(args):
     else:
         print("No tasks to be updated")
                     
+def delete(args):
+    if os.path.exists("tasks.json"):
+        try:
+            with open("tasks.json", "r") as file:
+                tasks = json.load(file)
+            
+            if len(args) <= 2:
+                print("Not enough arguments")
+                return
+            #Check if Id is valid
+            elif not args[2].isdigit():
+                print(f"Invalid Id: {args[2]}")
+                return
+            #Check if there is too many arguments
+            elif len(args) >= 4:
+                print(f"Invalid arguments: {" ".join(args[3:])}")
+                return
+            
+            id = args[2]
+            found = False
 
+            #Iterate over each task
+            for i,task in enumerate(tasks):
+                #once we found it we delete it
+                if task["id"] == int(id):
+                    found = True
+                    del tasks[i]
+                    break
+            
+            if not found:
+                print(f"No task with Id: {id}")
+                return
+           
+            with open("tasks.json", "w") as file:
+                json.dump(tasks, file, indent=4)
+                print("Task deleted successfully")
+
+        except json.JSONDecodeError:
+            print("No tasks to be deleted")
+
+    else:
+        print("No tasks to be deleted")
 
 #handling and calling each command
 def main():
@@ -145,6 +192,8 @@ def main():
             list(sys.argv)
         elif command == "update":
             update(sys.argv)
+        elif command == "delete":
+            delete(sys.argv)
         else:
             print(f"Unkown command: {command}")
     else:
