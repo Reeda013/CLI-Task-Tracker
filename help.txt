@@ -1,0 +1,30 @@
+Name:           task-tracker.py
+
+Description:    CLI task tracker/ todo list
+
+Commands:
+    add [task]:
+        Adds the desired task
+    
+    update [id] [new_task]:
+        Updates the tasks
+    
+    delete [id]:
+        Deletes the tasks (Doesn't sequentially change Ids, Ids are static)
+    
+    list:
+        lists all tasks in the format: {Id}-{task}: {status}
+        Syntax:
+            list done:
+                lists all tasks that are done
+            list todo:
+                lists all tasks marked as todo
+            list in-progress:
+                lists all tasks marked as in-progress
+
+
+    mark-in-progress [id]:
+        Marks task as in-progress (default status for a task is todo)
+
+    mark-done [id]:
+        Marks task as done

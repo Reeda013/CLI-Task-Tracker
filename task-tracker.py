@@ -284,7 +284,10 @@ def done(args):
     except json.JSONDecodeError:
         print("No tasks to mark as done")
 
-
+def help():
+    with open("help.txt") as file:
+        print(file.read())
+    
 #handling and calling each command
 def main():
     if len(sys.argv) >= 2:
@@ -301,10 +304,12 @@ def main():
             in_progress(sys.argv)
         elif command == "mark-done":
             done(sys.argv)
+        elif command == "--help":
+            help()
         else:
-            print(f"Unkown command: {command}")
+            print(f"Unkown command: {command}\nUse --help for help")
     else:
-        print("No command specified")
+        print("No command specified\nUse --help for help")
 
 main()
 
