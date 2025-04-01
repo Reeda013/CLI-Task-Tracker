@@ -38,7 +38,7 @@ def add(args):
         
         print(f"{description} added with id: {max_id+1}")
     else:
-        print("No task to be added")
+        print("No tasks to be added")
 
 def list(args):
 
@@ -58,14 +58,14 @@ def list(args):
                                 # desired number of arguments
                                 if len(args)>3:
                                     print("Invalid arguments")
-                                    break
+                                    return
 
                                 status = args[2]
                                 
                                 #Check if the status is one of these 3
                                 if status not in {"todo", "done", "in-progress"}:
-                                    print("Invalid argument")
-                                    break 
+                                    print("Invalid arguments")
+                                    return
                                 
                                 #Print the tasks with the said status
                                 if task["status"] == status:
@@ -75,6 +75,7 @@ def list(args):
                             if not printed: 
                                 #if there was no print
                                 print(f"No tasks marked as {status}")
+                                return
 
                         except IndexError:    
                             #if there is no argument
@@ -145,9 +146,15 @@ def delete(args):
             with open("tasks.json", "r") as file:
                 tasks = json.load(file)
             
-            if len(args) <= 2:
+            if not tasks:
+                print("No tasks to delete")
+                return
+            
+            #Check if Id was given
+            elif len(args) <= 2:
                 print("Not enough arguments")
                 return
+            
             #Check if Id is valid
             elif not args[2].isdigit():
                 print(f"Invalid Id: {args[2]}")
@@ -182,6 +189,56 @@ def delete(args):
     else:
         print("No tasks to be deleted")
 
+
+def in_progress(args):
+
+    if not os.path.exists("tasks.json"):
+        print("No tasks to mark in progress")
+        return
+
+    try:
+        with open("tasks.json", "r") as file:
+            tasks = json.load(file)
+        #Base cases
+        if not tasks:
+            print("No tasks to mark in progress")
+            return
+        
+        elif len(args) <= 2:
+            print("Not enough arguments")
+            return
+        
+        elif len(args) > 3:
+            print("Operation supports 1 argument only")
+            return
+        
+        elif not args[2].isdigit():
+            print("Invalid Id")
+            return
+        
+        id = args[2]
+        found = False
+
+        for task in tasks:
+            if task["id"] == int(id):
+                task["status"] = "in-progress"
+                task["updatedAt"] = time.strftime("%d-%m-%Y %H:%M:%S", time.localtime())
+                found = True
+                break
+        
+        if not found:
+            print(f"No task with Id: {id}")
+            return
+        
+        with open("tasks.json", "w") as file:
+            json.dump(tasks, file, indent=4)
+            print(f"Marked {task["description"]} as in progress")
+
+    except json.JSONDecodeError:
+        print("No tasks to mark in progress")
+
+
+
 #handling and calling each command
 def main():
     if len(sys.argv) >= 2:
@@ -194,6 +251,8 @@ def main():
             update(sys.argv)
         elif command == "delete":
             delete(sys.argv)
+        elif command == "mark-in-progress":
+            in_progress(sys.argv)
         else:
             print(f"Unkown command: {command}")
     else:
